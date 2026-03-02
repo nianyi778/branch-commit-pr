@@ -22,7 +22,7 @@ Analyze the user's request to determine which phase(s) to execute:
 | "commit", "save changes" | `COMMIT_ONLY` | Phase 0 → 2 |
 | "open PR", "create pull request", "submit" | `PR_ONLY` | Phase 0 → 3 |
 | "commit and PR", "finish up" | `COMMIT_AND_PR` | Phase 0 → 2 → 3 |
-| "set default branch to X" | `CONFIG` | Phase 0 (override) |
+| "set default branch to X" | `CONFIG` | Phase 0 (override + persist) |
 
 **If ambiguous, ask the user which phase(s) they want.**
 
@@ -33,12 +33,15 @@ Analyze the user's request to determine which phase(s) to execute:
 Execute ALL of the following in parallel:
 
 ```bash
+# Group 0: User-configured default branch (highest priority)
+git config --local bcp.default-branch 2>/dev/null || echo "NOT_SET"
+
 # Group 1: Repository state
 git status --porcelain
 git branch --show-current
 git remote -v
 
-# Group 2: Default branch detection
+# Group 2: Default branch detection (if not user-configured)
 git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||'
 git remote show origin 2>/dev/null | grep 'HEAD branch' | awk '{print $NF}'
 
@@ -57,12 +60,24 @@ git rev-parse --abbrev-ref @{upstream} 2>/dev/null || echo "NO_UPSTREAM"
 
 ```
 PRIORITY ORDER:
-1. User explicitly set → use that
-2. git symbolic-ref refs/remotes/origin/HEAD → most reliable
-3. git remote show origin → fallback (requires network)
-4. Check if 'main' or 'master' exists in remote branches → last resort
-5. FAIL with clear error if none found
+1. git config --local bcp.default-branch → user explicitly set (persistent, per-repo)
+2. User says "use X as default branch" in current conversation → use + offer to persist
+3. git symbolic-ref refs/remotes/origin/HEAD → auto-detect from remote
+4. git remote show origin → fallback (requires network)
+5. Check if 'main' or 'master' exists in remote branches → last resort
+6. FAIL with clear error → ask user to set: "Which branch should I use as the base?"
+
+TO SET/CHANGE DEFAULT BRANCH:
+  git config --local bcp.default-branch <branch-name>
+
+TO CLEAR (revert to auto-detect):
+  git config --local --unset bcp.default-branch
 ```
+
+**When user says "set default branch to X" or "use X as base branch":**
+1. Validate that branch X exists (`git branch -r` or `git branch`)
+2. Run `git config --local bcp.default-branch X`
+3. Confirm: "Default branch set to X for this repo. All future branches will be created from X."
 
 **Store as `DEFAULT_BRANCH` for all subsequent phases.**
 
@@ -124,7 +139,7 @@ JIRA CONFIG (if enabled):
 ```
 CONTEXT DETECTED
 ================
-Default branch: [main | master | develop | ...]
+Default branch: [main | master | develop | ...] (source: user-configured | auto-detected)
 Current branch: [branch-name]
 Branch naming: [conventional | issue-prefixed | slash-separated | flat]
 Commit style: [semantic | plain] + [english | cjk]
