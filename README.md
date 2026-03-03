@@ -2,6 +2,20 @@
 
 A complete git development workflow skill for AI coding agents. Handles the entire cycle: **detect default branch → create feature branch → atomic commits → pull request**.
 
+## 10-Second Install
+
+```bash
+npx skills add nianyi778/branch-commit-pr
+```
+
+## 30-Second Quick Start
+
+After installing, say one of these:
+
+- `"Create a branch for login feature"`
+- `"Commit my changes as atomic commits"`
+- `"Open a PR for #42"`
+
 ## Features
 
 - **Smart Detection** — Auto-detects default branch, branch naming conventions, and commit style from your repo history
@@ -59,6 +73,15 @@ Just describe what you want in natural language:
 | "Open a PR" | Generates title/body from commits, creates PR via `gh` |
 | "Commit and create PR for #42" | Commits, creates PR, links GitHub Issue #42 |
 
+## Marketplace Visibility (skills.sh)
+
+This repository is already in the format that `skills.sh` CLI can install directly.
+
+- Install command users should run:
+  - `npx skills add nianyi778/branch-commit-pr`
+- `skills.sh` visibility/leaderboard is driven by real CLI installs (not a manual submit form).
+- Keep this repo public and keep the install command in your README to maximize discovery.
+
 ## Jira Integration (Optional)
 
 To enable Jira ticket linking, set these environment variables:
@@ -92,6 +115,15 @@ Creates a PR via `gh` CLI with a generated title, summary bullets, commit list, 
 - `git` — Any modern version
 - [`gh`](https://cli.github.com/) — GitHub CLI (for PR creation). Run `gh auth login` to authenticate.
 - Jira integration requires `curl` and the environment variables above.
+
+## Copy-Paste Examples
+
+```text
+Start working on dark mode for settings page
+Create a branch for PROJ-123 login timeout fix
+Commit all current changes with atomic commits
+Create a PR for PROJ-123 and move it to In Review
+```
 
 ## Supported Agents
 
