@@ -159,8 +159,14 @@ gh CLI: [authenticated | not available]
 ABORT IF:
 - Not in a git repository
 - DEFAULT_BRANCH not resolved
-- Working directory dirty AND user didn't say to stash
-  → Ask: "You have uncommitted changes. Stash them first?"
+
+DIRTY WORKING DIRECTORY HANDLING (smart defaults — do NOT ask unless necessary):
+- COMMIT_ONLY / COMMIT_AND_PR → Dirty is EXPECTED. Proceed directly.
+- BRANCH_ONLY / FULL_CYCLE →
+    1. Try: git stash → checkout DEFAULT_BRANCH → pull → checkout -b BRANCH → git stash pop
+    2. If stash pop conflicts → warn user and let them resolve
+    3. NEVER ask "do you want to stash?" — just do it automatically
+- PR_ONLY → Changes must be committed first. Auto-stage + commit, or warn.
 
 WARN IF:
 - Already on a feature branch (not default)
@@ -248,9 +254,10 @@ git diff --staged --stat
 ABORT IF:
 - No changes (staged or unstaged) → "Nothing to commit."
 
-ASK IF:
-- Only unstaged changes → "Stage all changes, or select specific files?"
-- Both staged and unstaged → "Commit only staged changes, or include all?"
+SMART DEFAULTS (do NOT ask — just do):
+- Only unstaged changes → Stage all and proceed.
+- Both staged and unstaged → Commit only staged changes (respect user's intent).
+- Only staged changes → Commit them directly.
 ```
 
 ### 2.2 Atomic Commit Planning
@@ -531,7 +538,66 @@ Users can override detected conventions by stating preferences:
 | Branch already exists | Ask: "Branch X exists. Switch to it, or create X-2?" |
 | PR already exists for branch | Show existing PR URL, ask if user wants to update it |
 | Jira API fails | Warn and continue without Jira linking (non-blocking) |
-| Dirty working directory | Ask: "Stash changes?" or "Commit first?" |
+| Dirty working directory | Smart default: auto-stash for branch ops, proceed for commit ops (see Phase 1.1) |
+
+---
+
+## PLATFORM ADAPTATION
+
+This skill is model-agnostic. It works with any AI coding agent that has shell access.
+
+### Claude Code
+Native support. Install via:
+```bash
+claude install-skill https://github.com/anthropics/personage/tree/main/commit_pr
+```
+Or add `SKILL.md` to your project's `.claude/skills/` directory.
+
+### OpenAI Codex
+Add `SKILL.md` content to your Codex system prompt or project instructions:
+```bash
+# In your repo, reference it as agent instruction
+cp SKILL.md .codex/instructions/branch-commit-pr.md
+```
+Or paste the content into Codex's "Instructions" field in the UI.
+
+### Cursor
+Add as a project-level rule:
+```bash
+cp SKILL.md .cursor/rules/branch-commit-pr.mdc
+```
+Prefix the file with frontmatter to control activation:
+```yaml
+---
+description: Git workflow — branch, commit, PR
+globs:
+alwaysApply: false
+---
+```
+
+### Windsurf
+Add to workspace rules:
+```bash
+cp SKILL.md .windsurf/rules/branch-commit-pr.md
+```
+
+### Gemini CLI
+Reference in your `GEMINI.md` or project instructions:
+```markdown
+<!-- In GEMINI.md -->
+Follow the workflow defined in .gemini/skills/branch-commit-pr.md
+```
+
+### Other Agents (Cline, Aider, etc.)
+Most agents support custom system prompts. The general approach:
+1. Copy `SKILL.md` into the agent's instruction/rules directory
+2. Or paste content into the agent's system prompt configuration
+3. Ensure the agent has `git` and `gh` CLI access in its shell
+
+### Cross-Model Tips
+- **Be explicit over implicit** — this skill uses concrete defaults ("auto-stash and proceed") rather than open-ended questions, which ensures consistent behavior across models of varying capability.
+- **Bash is the universal interface** — all operations use standard `git` and `gh` commands. No model-specific APIs or tool names are required.
+- **Structured format aids weaker models** — decision tables and numbered steps reduce ambiguity compared to prose instructions.
 
 ---
 
