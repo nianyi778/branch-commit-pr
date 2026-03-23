@@ -1,8 +1,6 @@
 ---
 name: branch-commit-pr
-description: "Complete git development workflow: detect default branch, create feature branches with smart naming, make atomic commits following repo conventions, and open pull requests with GitHub Issues or Jira linking. Use when asked to 'start working on', 'create a branch', 'commit', 'open a PR', 'submit changes', or any full dev-cycle task."
-license: MIT
-allowed-tools: Read Write Bash Glob Grep
+description: Use when asked to start working on a feature, create a branch, commit changes, open a PR, submit changes, or complete any part of the git development cycle from branch creation to pull request.
 ---
 
 # Branch → Commit → PR
