@@ -1,8 +1,6 @@
 ---
 name: branch-commit-pr
-description: "Complete git development workflow: detect default branch, create feature branches with smart naming, make atomic commits following repo conventions, and open pull requests with GitHub Issues or Jira linking. Use when asked to 'start working on', 'create a branch', 'commit', 'open a PR', 'submit changes', or any full dev-cycle task."
-license: MIT
-allowed-tools: Read Write Bash Glob Grep
+description: Use when asked to start working on a feature, create a branch, commit changes, open a PR, submit changes, or complete any part of the git development cycle from branch creation to pull request.
 ---
 
 # Branch → Commit → PR
@@ -114,9 +112,7 @@ DETECTION:
   ELSE: COMMIT_STYLE = "plain" (safe default)
 
 LANGUAGE:
-  Count Korean/CJK characters vs English-only commits.
-  IF CJK >= 50%: COMMIT_LANG = "cjk"
-  ELSE: COMMIT_LANG = "english"
+  COMMIT_LANG = "english" (always — commits must be in English regardless of repo history)
 ```
 
 ### 0.4 Issue Tracker Detection
@@ -284,22 +280,16 @@ COMBINE ONLY WHEN:
 Based on `COMMIT_STYLE` and `COMMIT_LANG` from Phase 0.3:
 
 ```
-SEMANTIC + ENGLISH:
+SEMANTIC:
   "feat: add user authentication middleware"
   "fix: resolve null pointer in login handler"
   "refactor: extract validation logic to utils"
 
-SEMANTIC + CJK:
-  "feat: ユーザー認証ミドルウェアを追加"
-  "feat: 添加用户认证中间件"
-
-PLAIN + ENGLISH:
+PLAIN:
   "Add user authentication middleware"
   "Fix null pointer in login handler"
 
-PLAIN + CJK:
-  "ユーザー認証ミドルウェアを追加"
-  "添加用户认证中间件"
+NOTE: Always write commit messages in English, regardless of the repo's existing commit language.
 ```
 
 ### 2.4 Execute Commits
@@ -388,7 +378,7 @@ IF multiple commits, mixed:
 
 ALWAYS:
   → Match COMMIT_STYLE (semantic prefix or plain)
-  → Match COMMIT_LANG
+  → Write in English
 ```
 
 ### 3.4 Generate PR Body
