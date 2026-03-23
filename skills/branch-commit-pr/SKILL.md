@@ -114,9 +114,7 @@ DETECTION:
   ELSE: COMMIT_STYLE = "plain" (safe default)
 
 LANGUAGE:
-  Count Korean/CJK characters vs English-only commits.
-  IF CJK >= 50%: COMMIT_LANG = "cjk"
-  ELSE: COMMIT_LANG = "english"
+  COMMIT_LANG = "english" (always — commits must be in English regardless of repo history)
 ```
 
 ### 0.4 Issue Tracker Detection
@@ -284,22 +282,16 @@ COMBINE ONLY WHEN:
 Based on `COMMIT_STYLE` and `COMMIT_LANG` from Phase 0.3:
 
 ```
-SEMANTIC + ENGLISH:
+SEMANTIC:
   "feat: add user authentication middleware"
   "fix: resolve null pointer in login handler"
   "refactor: extract validation logic to utils"
 
-SEMANTIC + CJK:
-  "feat: ユーザー認証ミドルウェアを追加"
-  "feat: 添加用户认证中间件"
-
-PLAIN + ENGLISH:
+PLAIN:
   "Add user authentication middleware"
   "Fix null pointer in login handler"
 
-PLAIN + CJK:
-  "ユーザー認証ミドルウェアを追加"
-  "添加用户认证中间件"
+NOTE: Always write commit messages in English, regardless of the repo's existing commit language.
 ```
 
 ### 2.4 Execute Commits
@@ -388,7 +380,7 @@ IF multiple commits, mixed:
 
 ALWAYS:
   → Match COMMIT_STYLE (semantic prefix or plain)
-  → Match COMMIT_LANG
+  → Write in English
 ```
 
 ### 3.4 Generate PR Body
