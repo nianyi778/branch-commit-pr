@@ -138,7 +138,7 @@ CONTEXT DETECTED
 Default branch: [main | master | develop | ...] (source: user-configured | auto-detected)
 Current branch: [branch-name]
 Branch naming: [conventional | issue-prefixed | slash-separated | flat]
-Commit style: [semantic | plain] + [english | cjk]
+Commit style: [semantic | plain] + english
 Issue tracking: [GitHub Issues | Jira (PROJ) | both | none]
 Working directory: [clean | N files modified]
 Upstream: [tracked | untracked]
